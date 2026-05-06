@@ -7,7 +7,56 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Test {
-    id   Int    @id @default(autoincrement())
-    name String
+enum InvoiceStatus {
+    draft
+    issued
+    paid
+    void
+}
+
+model Invoice {
+    id     String @id @default(uuid())
+    number String @unique
+
+    customerName  String
+    customerEmail String
+
+    currency String
+
+    subtotalMinor Int
+    taxMinor      Int
+    totalMinor    Int
+    taxRateBps    Int
+
+    issuedAt DateTime?
+    dueAt    DateTime?
+
+    status InvoiceStatus @default(draft)
+
+    lineItems LineItem[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([createdAt])
+}
+
+model LineItem {
+    id String @id @default(uuid())
+
+    description    String
+    quantity       Int
+    unitPriceMinor Int
+
+    invoiceId String
+    invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model InvoiceCounter {
+    id String @id @default(uuid())
+
+    yearMonth String @unique // e.g., "202605"
+    current   Int // last used sequence
+
+    updatedAt DateTime @updatedAt
 }

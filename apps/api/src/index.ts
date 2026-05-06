@@ -1,27 +1,27 @@
 import Fastify from "fastify";
-import { PrismaClient } from "@prisma/client";
+import prismaPlugin from "./plugins/prisma";
+import invoiceRoutes from "./modules/invoice/invoices.routes";
 
-const app = Fastify();
+const app = Fastify({ logger: true });
 
-// Initialize Prisma Client with adapter
-const prisma = new PrismaClient();
+// register plugins
+app.register(prismaPlugin);
+
+// register routes
+app.register(invoiceRoutes, { prefix: "/invoices" });
 
 app.get("/", async () => {
   return { message: "API running 🚀" };
 });
 
-app.get("/test-db", async () => {
-  const data = await prisma.test.create({
-    data: { name: "working ✅" },
-  });
-
-  return data;
-});
-
-app.listen({ port: 3000 }, (err, address) => {
-  if (err) {
-    console.error(err);
+const start = async () => {
+  try {
+    await app.listen({ port: 3000 });
+    console.log("Server running on http://localhost:3000");
+  } catch (err) {
+    app.log.error(err);
     process.exit(1);
   }
-  console.log(`Server running at ${address}`);
-});
+};
+
+start();
