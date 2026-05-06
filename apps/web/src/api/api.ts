@@ -1,6 +1,6 @@
 import type { Invoice, PaginatedInvoices } from "../types";
 
-const BASE = "http://localhost:3000";
+const BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   const json = await response.json().catch(() => null);
