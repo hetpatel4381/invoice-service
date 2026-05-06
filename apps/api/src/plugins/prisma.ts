@@ -3,6 +3,12 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+declare module "fastify" {
+  interface FastifyInstance {
+    prisma: PrismaClient;
+  }
+}
+
 export default fp(async (fastify) => {
   fastify.decorate("prisma", prisma);
 
